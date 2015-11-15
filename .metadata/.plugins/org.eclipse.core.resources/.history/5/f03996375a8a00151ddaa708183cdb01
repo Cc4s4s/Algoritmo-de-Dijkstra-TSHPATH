@@ -1,0 +1,97 @@
+import java.util.*;
+class TSHPATH
+{
+	public static void main (String[] args){
+		Scanner leo = new Scanner(System.in);        
+        int t = leo.nextInt();
+        
+        for(int i = 0; i < t; i++)
+        {
+            HashMap<String, Integer> ciudades = new HashMap<String,Integer>();
+            //Mapa key = nombre de la ciudad Mapa value = el valor dentro del grafo ya que el input
+            //no da un valor para cada uno de los Nodos que se van agregando (ej primer nodo = 1)
+            
+            HashMap<Integer, Integer>  caminoMasCorto = new HashMap<Integer,Integer>();
+            //Mapa donde se van a ir guardando los valores de las aristas que comunican a la ciudad vecina de menor valor
+            
+            HashMap<Integer, HashMap<Integer, Integer>>  vecinos = new HashMap<Integer,HashMap<Integer, Integer>>();
+            //Este mapa lo vamos a utilizar para guardar la cantidad de vecinos (Nodos adyacentes) y los valores de las aristas que 
+            //los conectan
+            
+            ArrayList<Integer> vConocidos = new ArrayList<Integer>();
+            //Lista de caminos visitados
+            
+            
+            int cantCiudades = leo.nextInt();//leemos la cantidad de ciudades
+            PriorityQueue<Integer> q = new PriorityQueue<Integer>(cantCiudades, new Comparator<Integer>()
+            //genereramos una cola de prioridad con la cantidad de ciudades y las ordenamos con el comparator
+            {
+                public int compare(Integer p, Integer q)
+                {
+                    return caminoMasCorto.get(p) - caminoMasCorto.get(q);
+                }
+            });
+            
+            //rellenamos el grafo con los nombre de las ciudades, sus aristas vecinas y a que nodo van
+            for(int j = 1; j <= cantCiudades; j++)
+            {               
+            	ciudades.put(leo.next(), j);
+                int nVecino = leo.nextInt();
+                HashMap<Integer, Integer> pesos = new HashMap<Integer, Integer>(); 
+                for(int k = 0; k < nVecino; k++)
+                {
+                    
+                	pesos.put(leo.nextInt(), leo.nextInt());
+                }
+
+                vecinos.put(j, pesos);
+            }
+            int vRestantes = leo.nextInt();
+            
+            for(int j = 0; j < vRestantes; j++)
+            {
+                for(int k = 1; k <= cantCiudades; k++)
+                {
+                	caminoMasCorto.put(k, Integer.MAX_VALUE);
+                }
+                vConocidos.clear();
+                String desde = leo.next();
+                caminoMasCorto.put(ciudades.get(desde), 0);
+                q.add(ciudades.get(desde));
+                String to = leo.next();
+                int v2 = ciudades.get(to);
+                
+                while(!q.isEmpty())
+                {
+
+                    int vActual = q.remove();
+                    if(vActual == v2)
+                    {
+                     break;   
+                    }
+                    vConocidos.add(vActual);
+                    HashMap<Integer, Integer> peso = vecinos.get(vActual);
+                    
+                    for(int vecino : peso.keySet())
+                    {
+                        int valorCamino = caminoMasCorto.get(vActual) + peso.get(vecino);
+                        if(valorCamino < caminoMasCorto.get(vecino))
+                        {
+                        	caminoMasCorto.put(vecino, valorCamino);
+                        }
+                        if(!vConocidos.contains(vecino))
+                        {
+                        q.add(vecino);
+                        }
+                        
+                    }
+                    
+                }
+
+                System.out.println(caminoMasCorto.get(v2));
+                
+            }
+            
+        }leo.close();
+	}
+}
